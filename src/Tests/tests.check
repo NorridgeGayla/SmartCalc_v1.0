@@ -1,0 +1,110 @@
+#include <limits.h>
+#include <stdio.h>
+
+#include "../Backend/headers/calculation.h"
+#include "../Backend/headers/common.h"
+#include "../Backend/headers/reverse_polish_notation.h"
+#include "../Backend/headers/stack_tokens.h"
+#include "../Backend/headers/validation.h"
+
+#define AMOUNT_RIGHT_DATA 19
+#define AMOUNT_INCORRECT_DATA 20
+#define SIZE 100
+#define EPS 1e-07
+
+char input_right_data[AMOUNT_RIGHT_DATA][SIZE] = {
+    "0",
+    "0.0",
+    "1.2",
+    "x",
+    "pi",
+    "e",
+    "cos(x)",
+    "sin(x)",
+    "tan(x)",
+    "acos(x)",
+    "asin(x)",
+    "atan(x)",
+    "ln(x)",
+    "log(x)",
+    "sqrt(x)",
+    "5mod4",
+    "-sin(2*x)+cos(pi-e)+(-4)^7.0/(7.2mod1.3)-sqrt(18)+(-13)",
+    "+pi",
+    "1234567.8912434+0.1"};
+double compared_value[AMOUNT_RIGHT_DATA] = {0.0,
+                                            0.0,
+                                            1.2,
+                                            1.0,
+                                            M_PI,
+                                            M_E,
+                                            0.5403023,
+                                            0.8414710,
+                                            1.5574077,
+                                            0.0,
+                                            1.5707963,
+                                            0.7853982,
+                                            0.0,
+                                            0.0,
+                                            1.0,
+                                            1.0,
+                                            -23422.9544899,
+                                            M_PI,
+                                            1234567.9912434};
+
+char input_incorrect_data[AMOUNT_INCORRECT_DATA][SIZE] = {
+    ".",       "1.22.3", "1.2x",  "cosx",   "sinx",     "tanx", "acosx",
+    "asinx",   "atanx",  "lnx",   "logx",   "sqrtx",    "2++3", "cos(x)sin(x)",
+    "cos5*x)", "12@54",  "hello", "sin)x(", "2.3+/1.0", ".4"};
+
+#test input_right_data_1
+int output = OK;
+int amount_tokens = 0;
+double x_value = 1.0;
+double result = 0.0;
+for (int i = 0; i < AMOUNT_RIGHT_DATA; ++i) {
+  output = input_array_validation(input_right_data[i]);
+  ck_assert_int_eq(output, OK);
+  amount_tokens = 0;
+  token *token_array =
+      reverse_polish_notation(input_right_data[i], &amount_tokens);
+  ck_assert_ptr_nonnull(token_array);
+  x_value = 1.0;
+  result = 0.0;
+  output = calculation(token_array, amount_tokens, x_value, &result);
+  ck_assert_int_eq(output, OK);
+  ck_assert_double_lt(fabs(result - compared_value[i]), EPS);
+  free(token_array);
+}
+
+#test input_incorrect_data_1
+int output = OK;
+int amount_tokens = 0;
+double x_value = 1.0;
+double result = 0.0;
+for (int i = 0; i < AMOUNT_INCORRECT_DATA; ++i) {
+  output = input_array_validation(input_incorrect_data[i]);
+  amount_tokens = 0;
+  if (output == OK) {
+    token *token_array =
+        reverse_polish_notation(input_incorrect_data[i], &amount_tokens);
+    if (token_array != NULL) {
+      x_value = 1.0;
+      result = 0.0;
+      output = calculation(token_array, amount_tokens, x_value, &result);
+      ck_assert_int_eq(output, SYNTAX_ERROR);
+      free(token_array);
+    }
+  }
+}
+
+#test memory_test_1
+char *name = NULL;
+int output = input_array_validation(name);
+ck_assert_int_eq(output, MEMORY_ERROR);
+int amount_tokens = 0;
+token *array = reverse_polish_notation(name, &amount_tokens);
+ck_assert_ptr_null(array);
+double result = 0.0;
+output = calculation(array, amount_tokens, 1, &result);
+ck_assert_int_eq(output, MEMORY_ERROR);

@@ -1,0 +1,46 @@
+body {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 18pt;
+    background-color: #E1E6ED;
+    margin-left: 10%;
+    margin-right: 10%;
+    block-size: 100%;
+    color: #444444;
+}
+
+img {
+    display: block;
+    width: 100%;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    line-height: 80pt;
+}
+
+table {
+    width: 100%;
+}
+
+tr[data-name] {
+    font-weight: bold;
+    text-align: center;
+}
+
+.formula {
+    font-size: 30pt;
+    text-align: center;
+    height: 60pt;
+}
+
+span {
+    display: inline;
+    background-color: rosybrown;
+    padding: 1px 2px 1px 2px;
+    color: #FFFFFF;
+    line-height: 14px;
+    border-radius: 5%;
+}
